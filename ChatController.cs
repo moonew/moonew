@@ -10,504 +10,11 @@ public class ChatController : MonoBehaviour
     public AudioClip sendMessageSound;
     public AudioClip[] typingSound;
 
+    const float maskHeight = 993f;
 
 
 
-    public void ShowHeroineMessage(string line)
-    {
-        string charName             = line.Split(':')[0];
-        string sentence             = line.Split(':')[1];
-        Transform chatBoxTransform  = GameObject.Find("Chat_Boxes").transform;
-
-        //message box Prefab
-        GameObject obj = Instantiate(Resources.Load<GameObject>("Prefabs/Chat_Heroine"), chatBoxTransform);
-
-        //message box element.
-        Transform messageBox            = obj.transform.GetChild(0);
-        Text messageText                = messageBox.GetChild(0).GetComponent<Text>();
-        Image profilePhoto              = obj.transform.GetChild(1).GetComponent<Image>();
-        Text charNameText               = obj.transform.GetChild(2).GetComponent<Text>();
-        Image emoji                     = obj.transform.GetChild(4).GetComponent<Image>();
-        
-
-
-        //load Profile Photo and Input charName...
-        switch (charName)
-        {
-            
-            case "이슬비":
-                {
-                    profilePhoto.sprite = Resources.Load<Sprite>("Images/Chats/chat_sb");
-                    charNameText.text = charName;
-                }
-                break;
-            case "강나린":
-                {
-                    profilePhoto.sprite = Resources.Load<Sprite>("Images/Chats/chat_nr");
-                    charNameText.text = charName;
-                }
-                break;
-            case "안시은":
-                {
-                    profilePhoto.sprite = Resources.Load<Sprite>("Images/Chats/chat_se");
-                    charNameText.text = charName;
-                }
-                break;
-            default:
-                {
-                    profilePhoto.sprite = Resources.Load<Sprite>("Images/Chats/chat_empty");
-                    charNameText.text = charName;
-                }
-                break;
-        }
-
-        
-        //input sentence
-        if(sentence.Contains("<")&& sentence.Contains(">"))
-        {
-            string adjustSentence               = sentence.Split('<', '>')[0];
-            string fileName                     = sentence.Split('<', '>')[1];
-            messageText.text                    = adjustSentence;
-            emoji.sprite                        = Resources.Load<Sprite>("Images/Emoji/" + fileName);
-            messageBox.transform.localPosition = new Vector3(140f, -240, 0);
-            
-
-        }
-        else
-        {
-            messageText.text = sentence;
-        }
-
-        
-
-
-
-
-
-
-        //Where will the message boxes be placed??
-
-        
-        float panelHeight = 0;
-        float nextBoxPosY = 0;
-        float space = 50f;
-
-        for (int i = 0; i < chatBoxTransform.transform.childCount - 1; i++)
-        {
-
-            try
-            {
-                //이모티콘을 사용한 경우...
-                if (chatBoxTransform.GetChild(i).GetChild(4).gameObject.activeInHierarchy == true)
-                {
-                    nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 245.2f;
-                    nextBoxPosY += space;
-                }
-
-            }
-            catch
-            {
-                nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
-                nextBoxPosY += space;
-            }
-            
-        }
-        obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(100, -150 - nextBoxPosY);
-
-
-
-
-        //The size of the panel varies depending on the number of message boxes...
-        for (int i = 0; i < chatBoxTransform.childCount; i++)
-        {
-
-            try
-            {
-                if (chatBoxTransform.GetChild(i).GetChild(4).gameObject.activeInHierarchy == true)
-                {
-                    panelHeight += chatBoxTransform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 245.2f;
-                    panelHeight += space;
-                }
-            }
-            catch
-            {
-                panelHeight += chatBoxTransform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
-                panelHeight += space;
-            }
-        }
-
-        chatBoxTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(1920f, panelHeight + 150f);
-  
-        float maskHeight = GameObject.Find("Chat_Bg").GetComponent<RectTransform>().sizeDelta.y;
-
-        if (panelHeight + 50f >= maskHeight)
-        {
-            chatBoxTransform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, panelHeight - maskHeight + 150, 0);
-        }
-
-        obj.GetComponent<CanvasGroup>().alpha = 1;
-        
-        messageBox.gameObject.SetActive(true);
-
-    }
-
-
-    public void ShowPlayerMessage(string line)
-    {
-
-        string sentence = line.Split(':')[1];
-        Transform chatBoxes = GameObject.Find("Chat_Boxes").transform;
-
-        GameObject obj = Instantiate(Resources.Load<GameObject>("Prefabs/Chat_Player"), chatBoxes);
-        Transform box = obj.transform.GetChild(0);
-        Text messageText = box.GetChild(0).GetComponent<Text>();
-        messageText.text = sentence;
-
-
-        float boxHeight = messageText.GetComponent<Text>().preferredHeight + 22.5f > 73f ?
-            messageText.GetComponent<Text>().preferredHeight + 22.5f : 73f;
-
-        box.GetComponent<RectTransform>().sizeDelta
-            = new Vector2(messageText.GetComponent<Text>().preferredWidth + 42.5f, boxHeight);
-
-
-
-        float panelHeight = 0;
-        float nextBoxPosY = 0;
-        float space = 50f;
-
-
-        for (int i = 0; i < chatBoxes.transform.childCount - 1; i++)
-        {
-
-            try
-            {
-                if (chatBoxes.GetChild(i).GetChild(4).gameObject.activeInHierarchy == true)
-                {
-                    nextBoxPosY += chatBoxes.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 245.2f;
-                    nextBoxPosY += space;
-                }
-
-            }
-            catch
-            {
-                nextBoxPosY += chatBoxes.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
-                nextBoxPosY += space;
-            }
-
-        }
-
-        obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(75, -150 - nextBoxPosY);
-
-
-        for (int i = 0; i < chatBoxes.childCount; i++)
-        {
-
-            try
-            {
-                if (chatBoxes.GetChild(i).GetChild(4).gameObject.activeInHierarchy == true)
-                {
-                    panelHeight += chatBoxes.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 245.2f;
-                    panelHeight += space;
-                }
-            }
-            catch
-            {
-                panelHeight += chatBoxes.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
-                panelHeight += space;
-            }
-        }
-
-        chatBoxes.GetComponent<RectTransform>().sizeDelta = new Vector2(1920f, panelHeight + 150f);
-
-
-
-
-        float maskHeight = GameObject.Find("Chat_Bg").GetComponent<RectTransform>().sizeDelta.y;
-
-        if (panelHeight + 50 >= maskHeight)
-        {
-            chatBoxes.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, panelHeight - maskHeight + 150, 0);
-        }
-
-
-        box.gameObject.SetActive(true);
-    }
-
-
-
-    public IEnumerator RunShowHeroineMessage(string line)
-    {
-        string charName = line.Split(':')[0];
-        string sentence = line.Split(':')[1];
-        Transform chatBoxTransform = GameObject.Find("Chat_Boxes").transform;
-
-        //message box Prefab
-        GameObject obj = Instantiate(Resources.Load<GameObject>("Prefabs/Chat_Heroine"), chatBoxTransform);
-
-        //message box element.
-        Transform messageBoxTransform = obj.transform.GetChild(0);
-        Text messageText = messageBoxTransform.GetChild(0).GetComponent<Text>();
-        Image profilePhoto = obj.transform.GetChild(1).GetComponent<Image>();
-        Text charNameText = obj.transform.GetChild(2).GetComponent<Text>();
-        Image emoji = obj.transform.GetChild(4).GetComponent<Image>();
-        messageBoxTransform.gameObject.SetActive(true);
-
-
-
-        //load Profile Photo and Input charName...
-        switch (charName)
-        {
-
-            case "이슬비":
-                {
-                    profilePhoto.sprite = Resources.Load<Sprite>("Images/Chats/chat_sb");
-                    charNameText.text = charName;
-                }
-                break;
-            case "강나린":
-                {
-                    profilePhoto.sprite = Resources.Load<Sprite>("Images/Chats/chat_nr");
-                    charNameText.text = charName;
-                }
-                break;
-            case "안시은":
-                {
-                    profilePhoto.sprite = Resources.Load<Sprite>("Images/Chats/chat_se");
-                    charNameText.text = charName;
-                }
-                break;
-            default:
-                {
-                    profilePhoto.sprite = Resources.Load<Sprite>("Images/Chats/chat_empty");
-                    charNameText.text = charName;
-                }
-                break;
-        }
-
-
-        //input sentence
-        if (sentence.Contains("<") && sentence.Contains(">"))
-        {
-            string adjustSentence = sentence.Split('<', '>')[0];
-            string fileName = sentence.Split('<', '>')[1];
-            messageText.text = adjustSentence;
-            emoji.sprite = Resources.Load<Sprite>("Images/Emoji/" + fileName);
-            emoji.gameObject.SetActive(true);
-            messageBoxTransform.transform.localPosition = new Vector3(140f, -240, 0);
-        }
-        else
-        {
-            messageText.text = sentence;
-        }
-
-
-        yield return new WaitForEndOfFrame();
-
-        float boxHeight = messageText.GetComponent<Text>().preferredHeight + 22.5f > 73f ?
-            messageText.GetComponent<Text>().preferredHeight + 22.5f : 73f;
-
-        messageBoxTransform.GetComponent<RectTransform>().sizeDelta
-            = new Vector2(messageText.GetComponent<Text>().preferredWidth + 42.5f, boxHeight);
-
-
-
-
-
-
-        //Where will the message boxes be placed??
-
-
-        float panelHeight = 0;
-        float nextBoxPosY = 0;
-        float space = 50f;
-
-        for (int i = 0; i < chatBoxTransform.transform.childCount - 1; i++)
-        {
-
-            try
-            {   
-                if (chatBoxTransform.GetChild(i).GetChild(4).gameObject.activeInHierarchy == true)
-                {
-                    nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 245.2f;
-                    nextBoxPosY += space;
-                }
-
-            }
-            catch
-            {
-                nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
-                nextBoxPosY += space;
-            }
-
-        }
-        obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(100, -150 - nextBoxPosY);
-
-
-
-
-        //The size of the panel varies depending on the number of message boxes...
-        for (int i = 0; i < chatBoxTransform.childCount; i++)
-        {
-            try
-            {   
-                if (chatBoxTransform.GetChild(i).GetChild(4).gameObject.activeSelf == true)
-                {
-                    panelHeight += chatBoxTransform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 245.2f;
-                    panelHeight += space;
-
-                    Debug.Log("emo : " + panelHeight);
-                }
-            }
-            catch
-            {
-                panelHeight += chatBoxTransform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
-                panelHeight += space;
-
-                Debug.Log("basic : " + panelHeight);
-            }
-        }
-
-
-
-        chatBoxTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(1920f, panelHeight + 150f);
-
-        
-
-        
-        
-        
-
-        
-        
-
-
-        if (ConfigData.fastMode == false)
-        {
-            yield return StartCoroutine(RunLoadingHeroineMessage(obj, sentence));
-        }
-        else
-        {
-            AudioSource audioSource = GetComponent<AudioSource>();
-            audioSource.volume = ConfigData.effectVolume;
-            audioSource.PlayOneShot(getMessageSound);
-        }
-        
-        
-        emoji.GetComponent<CanvasGroup>().alpha = 1;
-        obj.GetComponent<CanvasGroup>().alpha = 1;
-
-        float maskHeight = GameObject.Find("Chat_Bg").GetComponent<RectTransform>().sizeDelta.y;
-
-        if (panelHeight + 50 >= maskHeight)
-            chatBoxTransform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, panelHeight - maskHeight + 150, 0);
-
-
-    }
-
-
-    public IEnumerator RunShowPlayerMessage(string line)
-    {
-        string sentence = line.Split(':')[1];
-        Transform chatBoxTransform = GameObject.Find("Chat_Boxes").transform;
-
-        GameObject obj = Instantiate(Resources.Load<GameObject>("Prefabs/Chat_Player"), chatBoxTransform);
-        Transform messageBoxTransform = obj.transform.GetChild(0);
-        Text messageText = messageBoxTransform.GetChild(0).GetComponent<Text>();
-        messageText.text = sentence;
-
-        yield return new WaitForEndOfFrame();
-
-        float boxHeight = messageText.GetComponent<Text>().preferredHeight + 22.5f > 73f ?
-            messageText.GetComponent<Text>().preferredHeight + 22.5f : 73f;
-
-        messageBoxTransform.GetComponent<RectTransform>().sizeDelta
-            = new Vector2(messageText.GetComponent<Text>().preferredWidth + 42.5f, boxHeight);
-
-
-
-        float panelHeight = 0;
-        float nextBoxPosY = 0;
-        float space = 50f;
-
-        for (int i = 0; i < chatBoxTransform.transform.childCount - 1; i++)
-        {
-
-            try
-            {
-                if (chatBoxTransform.GetChild(i).GetChild(4).gameObject.activeSelf == true)
-                {
-                    nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 245.2f;
-                    nextBoxPosY += space;
-                }
-
-            }
-            catch
-            {
-                nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
-                nextBoxPosY += space;
-            }
-
-        }
-
-        obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(75, -150 - nextBoxPosY);
-
-
-        for (int i = 0; i < chatBoxTransform.childCount; i++)
-        {
-
-            try
-            {
-                if (chatBoxTransform.GetChild(i).GetChild(4).gameObject.activeInHierarchy == true)
-                {
-                    panelHeight += chatBoxTransform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 245.2f;
-                    panelHeight += space;
-                }
-            }
-            catch
-            {
-                panelHeight += chatBoxTransform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
-                panelHeight += space;
-            }
-        }
-
-        chatBoxTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(1920f, panelHeight + 150f);
-
-
-        float maskHeight = GameObject.Find("Chat_Bg").GetComponent<RectTransform>().sizeDelta.y;
-
-
-
-        if (ConfigData.fastMode == false)
-        {
-            yield return StartCoroutine(RunLoadingPlayerMessage(sentence));
-        }
-        else
-        {
-            AudioSource audioSource = GetComponent<AudioSource>();
-            audioSource.volume = ConfigData.effectVolume;
-            audioSource.PlayOneShot(sendMessageSound);
-        }
-
-
-        messageBoxTransform.gameObject.SetActive(true);
-        
-
-
-        if (panelHeight + 50 >= maskHeight)
-            chatBoxTransform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, panelHeight - maskHeight + 150, 0);
-
-    }
-
-
-
-
-
-  
-
-
-
-
+    #region Show,Hide Chat Panel
 
     public void ShowChatPanel()
     {
@@ -519,15 +26,17 @@ public class ChatController : MonoBehaviour
         }
     }
 
+
     public void HideChatPanel()
     {
-        if(GameObject.Find("ChatPanel"))
+        if (GameObject.Find("ChatPanel"))
         {
             Destroy(GameObject.Find("ChatPanel"));
         }
-        
-        Resources.UnloadUnusedAssets();        
+
+        Resources.UnloadUnusedAssets();
     }
+
 
     public IEnumerator RunHideChatPanelImmidately()
     {
@@ -541,9 +50,6 @@ public class ChatController : MonoBehaviour
         yield return new WaitForSeconds(0.25f);
         Resources.UnloadUnusedAssets();
     }
-
-
-    
 
 
     public IEnumerator RunShowChatPanel()
@@ -568,12 +74,228 @@ public class ChatController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
     }
 
+    #endregion
 
-    
 
 
-    
-    
+
+
+    public void ShowHeroineMessage(string line)
+    {
+        string charName         = line.Split(':')[0];
+        string sentence         = line.Split(':')[1];
+        
+        Transform chatBoxTransform     = GameObject.Find("Chat_Boxes").transform;
+
+
+        GameObject chatBox = Instantiate(Resources.Load<GameObject>("Prefabs/Chat_Heroine"), chatBoxTransform);
+        
+
+        InputName(chatBox, charName);
+        SetSentenceBox(chatBox, sentence);
+        LocateSetHeroineBox(chatBox, chatBoxTransform);
+        SetPanelHeight(chatBoxTransform);
+        SetEmoji(chatBox, sentence);
+
+
+        if(chatBox.transform.childCount==5)
+        {
+            chatBox.transform.GetChild(4).GetComponent<CanvasGroup>().alpha = 1;
+        }
+        else
+        {
+            chatBox.transform.GetChild(0).gameObject.SetActive(true);
+        }
+            
+        chatBox.GetComponent<CanvasGroup>().alpha = 1;
+    }
+
+
+    public void ShowPlayerMessage(string line)
+    {
+
+        string sentence = line.Split(':')[1];
+        Transform chatBoxTransform = GameObject.Find("Chat_Boxes").transform;
+
+        GameObject chatBox = Instantiate(Resources.Load<GameObject>("Prefabs/Chat_Player"), chatBoxTransform);
+        
+        SetSentenceBox(chatBox, sentence);
+        LocateSetPlayerBox(chatBox, chatBoxTransform);
+        SetPanelHeight(chatBoxTransform);
+
+        chatBox.gameObject.SetActive(true);
+    }
+
+
+    public IEnumerator RunShowHeroineMessage(string line)
+    {
+        string charName = line.Split(':')[0];
+        string sentence = line.Split(':')[1];
+        Transform chatBoxes = GameObject.Find("Chat_Boxes").transform;
+
+        GameObject obj = Instantiate(Resources.Load<GameObject>("Prefabs/Chat_Heroine"), chatBoxes);
+
+        switch (charName)
+        {
+            case "이슬비":
+                {
+                    obj.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Chats/chat_sb");
+                }
+                break;
+            case "강나린":
+                {
+                    obj.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Chats/chat_nr");
+                }
+                break;
+            case "안시은":
+                {
+                    obj.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Chats/chat_se");
+                }
+                break;
+            default:
+                {
+                    obj.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Chats/chat_empty");
+                }
+                break;
+        }
+
+        obj.transform.GetChild(2).GetComponent<Text>().text = charName;
+
+        Transform box = obj.transform.GetChild(0);
+        Text messageText = box.GetChild(0).GetComponent<Text>();
+        messageText.text = sentence;
+
+        yield return new WaitForEndOfFrame();
+
+        float boxHeight = messageText.GetComponent<Text>().preferredHeight + 22.5f > 73f ?
+            messageText.GetComponent<Text>().preferredHeight + 22.5f : 73f;
+
+        box.GetComponent<RectTransform>().sizeDelta
+            = new Vector2(messageText.GetComponent<Text>().preferredWidth + 42.5f, boxHeight);
+
+
+        float panelHeight = 0;
+        float nextBoxPosY = 0;
+        float space = 50f;
+
+        for (int i = 0; i < chatBoxes.transform.childCount - 1; i++)
+        {
+            nextBoxPosY += chatBoxes.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
+            nextBoxPosY += space;
+        }
+
+        obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(100, -150 - nextBoxPosY);
+
+
+        for (int i = 0; i < chatBoxes.childCount; i++)
+        {
+            panelHeight += chatBoxes.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
+            panelHeight += space;
+        }
+
+        chatBoxes.GetComponent<RectTransform>().sizeDelta = new Vector2(1920f, panelHeight + 150f);
+
+        yield return new WaitForEndOfFrame();
+
+
+        float maskHeight = GameObject.Find("Chat_Bg").GetComponent<RectTransform>().sizeDelta.y;
+
+        if (panelHeight + 50f >= maskHeight)
+        {
+            chatBoxes.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, panelHeight - maskHeight + 150, 0);
+        }
+
+
+
+
+        obj.GetComponent<CanvasGroup>().alpha = 1;
+
+        if (ConfigData.fastMode == false)
+        {
+            yield return StartCoroutine(RunLoadingHeroineMessage(obj, sentence));
+        }
+        else
+        {
+            AudioSource audioSource = GetComponent<AudioSource>();
+            audioSource.volume = ConfigData.effectVolume;
+            audioSource.PlayOneShot(getMessageSound);
+        }
+
+        box.gameObject.SetActive(true);
+    }
+
+
+    public IEnumerator RunShowPlayerMessage(string line)
+    {
+        string sentence = line.Split(':')[1];
+        Transform chatBoxes = GameObject.Find("Chat_Boxes").transform;
+
+        GameObject obj = Instantiate(Resources.Load<GameObject>("Prefabs/Chat_Player"), chatBoxes);
+        Transform box = obj.transform.GetChild(0);
+        Text messageText = box.GetChild(0).GetComponent<Text>();
+        messageText.text = sentence;
+
+        yield return new WaitForEndOfFrame();
+
+        float boxHeight = messageText.GetComponent<Text>().preferredHeight + 22.5f > 73f ?
+            messageText.GetComponent<Text>().preferredHeight + 22.5f : 73f;
+
+        box.GetComponent<RectTransform>().sizeDelta
+            = new Vector2(messageText.GetComponent<Text>().preferredWidth + 42.5f, boxHeight);
+
+
+
+        float panelHeight = 0;
+        float nextBoxPosY = 0;
+        float space = 50f;
+
+        for (int i = 0; i < chatBoxes.transform.childCount - 1; i++)
+        {
+            nextBoxPosY += chatBoxes.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
+            nextBoxPosY += space;
+        }
+
+        obj.GetComponent<RectTransform>().anchoredPosition = new Vector3(75, -150 - nextBoxPosY);
+
+
+        for (int i = 0; i < chatBoxes.childCount; i++)
+        {
+            panelHeight += chatBoxes.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
+            panelHeight += space;
+        }
+        chatBoxes.GetComponent<RectTransform>().sizeDelta = new Vector2(1920f, panelHeight + 150f);
+
+
+        float maskHeight = GameObject.Find("Chat_Bg").GetComponent<RectTransform>().sizeDelta.y;
+
+
+
+        if (ConfigData.fastMode == false)
+        {
+            yield return StartCoroutine(RunLoadingPlayerMessage(sentence));
+        }
+        else
+        {
+            AudioSource audioSource = GetComponent<AudioSource>();
+            audioSource.volume = ConfigData.effectVolume;
+            audioSource.PlayOneShot(sendMessageSound);
+        }
+
+
+        box.gameObject.SetActive(true);
+
+        if (panelHeight + 50 >= maskHeight)
+        {
+            chatBoxes.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, panelHeight - maskHeight + 150, 0);
+        }
+    }
+
+
+
+
+
+
+    #region Loading Animation...
 
     IEnumerator RunLoadingHeroineMessage(GameObject obj, string sentence)
     {
@@ -583,7 +305,7 @@ public class ChatController : MonoBehaviour
         float time = 0;
 
         loadingAnim.SetActive(true);
-        
+
 
         while (time <= typingTime)
         {
@@ -613,7 +335,131 @@ public class ChatController : MonoBehaviour
         audioSource.Stop();
         audioSource.PlayOneShot(sendMessageSound);
     }
-    
 
+    #endregion
+
+
+
+    void InputName(GameObject chatBox, string charName)
+    {
+        switch (charName)
+        {
+            case "이슬비":
+                {
+                    chatBox.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Chats/chat_sb");
+                }
+                break;
+            case "강나린":
+                {
+                    chatBox.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Chats/chat_nr");
+                }
+                break;
+            case "안시은":
+                {
+                    chatBox.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Chats/chat_se");
+                }
+                break;
+            default:
+                {
+                    chatBox.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Chats/chat_empty");
+                }
+                break;
+        }
+
+        chatBox.transform.GetChild(2).GetComponent<Text>().text = charName;
+    }
+
+    void SetSentenceBox(GameObject chatBox, string sentence)
+    {
+        Transform sentenceBox = chatBox.transform.GetChild(0);
+        Text messageText = sentenceBox.GetChild(0).GetComponent<Text>();
+        messageText.text = sentence;
+
+        float boxHeight = messageText.GetComponent<Text>().preferredHeight + 22.5f > 73f ?
+            messageText.GetComponent<Text>().preferredHeight + 22.5f : 73f;
+
+        sentenceBox.GetComponent<RectTransform>().sizeDelta
+            = new Vector2(messageText.GetComponent<Text>().preferredWidth + 42.5f, boxHeight);
+    }
+
+    void LocateSetHeroineBox(GameObject chatBox, Transform chatBoxTransform)
+    {
+        float nextBoxPosY = 0;
+        float space = 50;
+
+        for (int i = 1; i < chatBoxTransform.transform.childCount; i++)
+        {
+            if (chatBoxTransform.transform.GetChild(i-1).childCount == 5)
+            {
+                nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 200f;
+                nextBoxPosY += space;
+            }
+            else
+            {
+                nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
+                nextBoxPosY += space;
+            }
+        }
+        chatBox.GetComponent<RectTransform>().anchoredPosition = new Vector3(100, -150 - nextBoxPosY);
+    }
+
+    void LocateSetPlayerBox(GameObject chatBox, Transform chatBoxTransform)
+    {
+        float nextBoxPosY = 0;
+        float space = 50;
+
+        for (int i = 1; i < chatBoxTransform.transform.childCount; i++)
+        {
+            if (chatBoxTransform.transform.childCount == 5)
+            {
+                nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 200f;
+                nextBoxPosY += space;
+            }
+            else
+            {
+                nextBoxPosY += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
+                nextBoxPosY += space;
+            }
+        }
+        chatBox.GetComponent<RectTransform>().anchoredPosition = new Vector3(75, -150 - nextBoxPosY);
+    }
+
+    void SetPanelHeight(Transform chatBoxTransform)
+    {
+        float panelHeight = 0;
+
+        float space = 50;
+
+        for (int i = 0; i < chatBoxTransform.childCount; i++)
+        {
+            if (chatBoxTransform.transform.childCount == 5)
+            {
+                panelHeight += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 200f;
+                panelHeight += space;
+            }
+            else
+            {
+                panelHeight += chatBoxTransform.transform.GetChild(i).GetChild(0).GetComponent<RectTransform>().sizeDelta.y + 45.2f;
+                panelHeight += space;
+            }
+        }
+
+        chatBoxTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(1920f, panelHeight + 150f);
+
+
+        if (panelHeight+ 50f >= maskHeight)
+        {
+            chatBoxTransform.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, panelHeight - maskHeight + 150, 0);
+        }
+    }
+
+    void SetEmoji(GameObject chatBox, string sentence)
+    {
+        if(sentence.Contains("<")&&sentence.Contains(">"))
+        {
+           GameObject emoji = Instantiate(Resources.Load<GameObject>("Prefabs/Emoji"),chatBox.transform);
+            emoji.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Emoji/" + sentence.Split('<', '>')[1]);
+        }
+    }
 
 }
