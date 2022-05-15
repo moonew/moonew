@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class ChatController : MonoBehaviour
 {
     // ㅇㅠ지 보수를 전혀 고려하지 않은 코딩이다라는 생각이 든다 ....
-    // 새로 다시 만들 것인가 ???
+    // 새로 다시 만들 것인가 ??? 깃허브 테스트
     public AudioClip getMessageSound;
     public AudioClip sendMessageSound;
     public AudioClip[] typingSound;
